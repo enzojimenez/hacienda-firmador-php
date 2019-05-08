@@ -12,6 +12,8 @@ git clone https://github.com/enzojimenez/hacienda-firmador-php.git
 
 ## Uso
 
+### FIRMAR:
+
 ```php
 <?php
 require(dirname(__FILE__) . '/hacienda/firmador.php');
@@ -29,6 +31,10 @@ $firmador = new Firmador();
 // Método para firmar comprobantes electrónicos
 $firmador->firmarXml($pfx, $pin, $xml_sin_firmar, $xml_firmado);
 ```
+
+### VALIDAR:
+
+[Próximanente!...]
 
 ## Quiere contribuir?
 Los "Pull Requests" son bienvenidos.

@@ -1,18 +1,3 @@
-# Firmador PHP - MdH
-
-Clase PHP para firmar comprobantes electrónicos para el Ministerio de Hacienda de Costa Rica
-
-## Instalación
-
-Requerido: PHP version 5.6.24+ recomendado por razones de seguridad
-
-```bash
-git clone https://github.com/enzojimenez/hacienda-firmador-php.git
-```
-
-## Uso
-
-```php
 <?php
 require(dirname(__FILE__) . '/hacienda/firmador.php');
 
@@ -28,11 +13,3 @@ $firmador = new Firmador();
 
 // Método para firmar comprobantes electrónicos
 $firmador->firmarXml($pfx, $pin, $xml_sin_firmar, $xml_firmado);
-```
-
-## Quiere contribuir?
-Los "Pull Requests" son bienvenidos.
-Para cambios importantes, primero abra un "Issue" para discutir qué le gustaría cambiar o mejorar.
-
-## Licencia
-[GNU AGPL](http://www.gnu.org/licenses/)

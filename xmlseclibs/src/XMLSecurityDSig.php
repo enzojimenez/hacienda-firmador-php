@@ -72,7 +72,7 @@ class XMLSecurityDSig
     private $signPolicy = [
         "name" 		=> "",
         "url" 		=> "https://tribunet.hacienda.go.cr/docs/esquemas/2016/v4.2/ResolucionComprobantesElectronicosDGT-R-48-2016_4.2.pdf",
-        "digest" 	=> "V8lVVNGDCPen6VELRD1Ja8HARFk="
+        "digest" 	=> "3gQCr0HYSdoxi0ZaRaJ4qs3mHfI=" // Base64_Encode(Hash_File(SHA_1))
     ];
 
     /** @var string|null */
@@ -145,6 +145,7 @@ class XMLSecurityDSig
         $this->reference1Id = "ReferenceKeyInfo";
         $this->signedProperties = "SignedProperties-" . $this->signatureId;
         $this->qualifyingProperties = $this->generateGUID('QualifyingProperties-');
+        //$this->signPolicy['digest'] = base64_encode(hash_file('sha1',$this->signPolicy['url'],true));
 
         $template = self::BASE_TEMPLATE;
         if (! empty($prefix)) {
@@ -882,7 +883,7 @@ class XMLSecurityDSig
      * @param XMLSecurityKey $objKey
      * @param null|DOMNode $appendToNode
      */
-    public function sign($objKey, $signatureValue, $appendToNode = null)
+    public function sign($objKey, $namespaces = null, $appendToNode = null)
     {
         // If we have a parent node append it now so C14N properly works
         if ($appendToNode != null) {
@@ -898,10 +899,31 @@ class XMLSecurityDSig
                 $nodeset = $xpath->query($query, $sInfo);
                 $sMethod = $nodeset->item(0);
                 $sMethod->setAttribute('Algorithm', $objKey->type);
-                $data = $this->canonicalizeData($sInfo, $this->canonicalMethod);
+                $canonicalNode = new DOMDocument();
+                $tempNode = $canonicalNode->importNode($sInfo, true);
+                $xmlns = $this->xmlFirstChild->getAttribute('xmlns');
+                if (!empty($xmlns)){
+                    $tempNode->setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",$xmlns);
+                }
+                $tempNode->setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:ds",self::XMLDSIGNS);
+                $xmlns_xsd = $this->xmlFirstChild->getAttribute('xmlns:xsd');
+                if (!empty($xmlns_xsd)){
+                    $tempNode->setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xsd",self::XML_SCHEMA);
+                }
+                $xmlns_xsi = $this->xmlFirstChild->getAttribute('xmlns:xsi');
+                if (!empty($xmlns_xsi)){
+                    $tempNode->setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xsi",self::XML_SCHEMA_INSTANCE);
+                }
+                if (is_array($namespaces)) {
+                    foreach($namespaces as $n){
+                        $tempNode->setAttributeNS("http://www.w3.org/2000/xmlns/",$n['qualifiedName'],$n['value']);
+                    }
+                }
+                $canonicalNode->appendChild($tempNode);
+                $data = $this->canonicalizeData($canonicalNode, $this->canonicalMethod);
                 $sigValue = base64_encode($this->signData($objKey, $data));
                 $sigValueNode = $this->createNewSignNode('SignatureValue', $sigValue);
-                $sigValueNode->setAttribute('Id',$signatureValue);
+                $sigValueNode->setAttribute('Id',$this->signatureValue);
                 if ($infoSibling = $sInfo->nextSibling) {
                     $infoSibling->parentNode->insertBefore($sigValueNode, $infoSibling);
                 } else {

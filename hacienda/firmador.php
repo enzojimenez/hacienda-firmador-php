@@ -78,7 +78,7 @@ class Firmador {
         $objSec->addReference($objSec->getXadesNode(),$objSec::SHA256,null, [ 'force_uri' => false, 'overwrite' => false, "type" => "http://uri.etsi.org/01903#SignedProperties" ], [ [ 'qualifiedName' => 'xmlns:xades', 'value' => $objSec::XADES ] ]);
 
         // Firma el archivo xml
-        $objSec->sign($objKey,$objSec->signatureValue);
+        $objSec->sign($objKey);
 
         // Adjuntar la firma al xml
         $objSec->appendSignature($xml->documentElement);

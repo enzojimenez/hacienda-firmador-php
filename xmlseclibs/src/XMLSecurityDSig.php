@@ -69,11 +69,7 @@ class XMLSecurityDSig
     const template = '<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="@"><ds:SignedInfo><ds:SignatureMethod /></ds:SignedInfo></ds:Signature>';
     const BASE_TEMPLATE = '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#" Id="@"><SignedInfo><SignatureMethod /></SignedInfo></Signature>';
 
-    private $signPolicy = [
-        "name" 		=> "",
-        "url" 		=> "https://tribunet.hacienda.go.cr/docs/esquemas/2016/v4.2/ResolucionComprobantesElectronicosDGT-R-48-2016_4.2.pdf",
-        "digest" 	=> "3gQCr0HYSdoxi0ZaRaJ4qs3mHfI=" // Base64_Encode(Hash_File(SHA_1))
-    ];
+    private $signPolicy = [];
 
     /** @var string|null */
     public $signatureId;
@@ -281,6 +277,28 @@ class XMLSecurityDSig
                 }
                 $canonNode->setAttribute('Algorithm', $this->canonicalMethod);
             }
+        }
+    }
+
+    public function setSignPolicy(){
+        $xmlns = $this->xmlFirstChild->getAttribute('xmlns');
+        switch ($xmlns){
+            case (strpos($xmlns, 'v4.2') !== false):
+                $this->signPolicy = [
+                    "name" 		=> "",
+                    "url" 		=> "https://tribunet.hacienda.go.cr/docs/esquemas/2016/v4.2/ResolucionComprobantesElectronicosDGT-R-48-2016_4.2.pdf",
+                    "digest" 	=> "3gQCr0HYSdoxi0ZaRaJ4qs3mHfI=" // Base64_Encode(Hash_File(SHA_1))
+                ];
+                break;
+            case (strpos($xmlns, 'v4.3') !== false):
+                $this->signPolicy = [
+                    "name" 		=> "",
+                    "url" 		=> "https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/ResolucionComprobantesElectronicosDGT-R-48-2016_4.3.pdf",
+                    "digest" 	=> "3gQCr0HYSdoxi0ZaRaJ4qs3mHfI=" // Base64_Encode(Hash_File(SHA_1))
+                ];
+                break;
+            default:
+                throw new Exception("Cannot validate version: Unsupported Version");
         }
     }
 

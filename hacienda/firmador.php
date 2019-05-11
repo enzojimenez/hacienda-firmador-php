@@ -50,6 +50,9 @@ class Firmador {
         // Mantener el primer nodo secundario original XML en memoria
         $objSec->xmlFirstChild = $xml->firstChild;
 
+        // Establecer política de firma
+        $objSec->setSignPolicy();
+
         // Cargar la información del certificado desde el archivo *.p12
         $certInfo = $objSec->loadCertInfo($pfx,$pin);
 

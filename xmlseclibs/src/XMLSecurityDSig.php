@@ -709,7 +709,7 @@ class XMLSecurityDSig
 
             $canonicalNode = new DOMDocument();
             $tempNode = $canonicalNode->importNode($node, true);
-            
+
             $xmlns = $this->xmlFirstChild->getAttribute('xmlns');
             if (!empty($xmlns)){
                 $tempNode->setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns",$xmlns);
@@ -1120,8 +1120,8 @@ class XMLSecurityDSig
 
         // Attach all certificate nodes and any additional data
         foreach ($certs as $X509Cert) {
+          if ($certData = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n".chunk_split($X509Cert, 64, "\n")."-----END CERTIFICATE-----\n")) {
             if ($issuerSerial || $subjectName) {
-                if ($certData = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n".chunk_split($X509Cert, 64, "\n")."-----END CERTIFICATE-----\n")) {
                     if ($subjectName && ! empty($certData['subject'])) {
                         if (is_array($certData['subject'])) {
                             $parts = array();
@@ -1162,9 +1162,13 @@ class XMLSecurityDSig
                     }
                 }
 
+                if ($certData["validTo_time_t"] <= time()){
+                  throw new Exception("One of the certificates is expired! Please use a valid certificate and try again.");
+                }
+
+                $x509CertNode = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509Certificate', $X509Cert);
+                $x509DataNode->appendChild($x509CertNode);
             }
-            $x509CertNode = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509Certificate', $X509Cert);
-            $x509DataNode->appendChild($x509CertNode);
         }
     }
 
@@ -1177,7 +1181,11 @@ class XMLSecurityDSig
     public function add509Cert($cert, $isPEMFormat=true, $isURL=false, $options=null)
     {
         if ($xpath = $this->getXPathObj()) {
-            self::staticAdd509Cert($this->sigNode, $cert, $isPEMFormat, $isURL, $xpath, $options);
+            try {
+                self::staticAdd509Cert($this->sigNode, $cert, $isPEMFormat, $isURL, $xpath, $options);
+            } catch (Exception $ex){
+                die($ex->getMessage());
+            }
         }
     }
 
@@ -1305,9 +1313,10 @@ class XMLSecurityDSig
         if (openssl_pkcs12_read($pfx, $key, $pin)) {
             $certInfo["publicKey"] = $key["cert"];
             $certInfo["privateKey"] = $key["pkey"];
-            $complem = openssl_pkey_get_details(openssl_pkey_get_private($key["pkey"]));
-            $certInfo["Modulus"] = base64_encode($complem['rsa']['n']);
-            $certInfo["Exponent"] = base64_encode($complem['rsa']['e']);
+            $keyGet = openssl_pkey_get_private($key["pkey"]);
+            $keyComplem = openssl_pkey_get_details($keyGet);
+            $certInfo["Modulus"] = base64_encode($keyComplem['rsa']['n']);
+            $certInfo["Exponent"] = base64_encode($keyComplem['rsa']['e']);
         } else {
             return null;
         }

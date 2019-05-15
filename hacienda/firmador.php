@@ -7,23 +7,23 @@ use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 /**
- * 
+ *
  * xmlseclibs.php is a library written in PHP for working with XML Encryption and Signatures.
- * 
+ *
  * The author of xmlseclibs is Rob Richards. Please see the license for xmlseclibs.
- * 
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 
+ *
  * hacienda.php
  *
  * Copyright 2019 Enzo Jiménez <enzofjh@gmail.com>
- * 
+ *
  * This class <Firmador> is an extended modification of xmlseclibs.php that has been improved
  * to be used as free software for signing Electronic Invoices in Costa Rica to comply with
  * government laws and protocols by using PHP as the main programming language.
- * 
+ *
  * You can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, 
+ * GNU Affero General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version, and also under
  * the terms of xmlseclibs licensing.
  *

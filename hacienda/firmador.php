@@ -39,10 +39,29 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
  */
 
 class Firmador {
-    public function firmarXml($pfx,$pin,$unsigned,$signed){
-        // Cargar el XML para ser firmado
+
+    const FROM_XML_STRING = 1;
+    const FROM_XML_FILE = 2;
+    const TO_BASE64_STRING = 3;
+    const TO_XML_STRING = 4;
+    const TO_XML_FILE = 5;
+
+    public function firmarXml($pfx,$pin,$input,$output,$path=null){
+
+        // Cargar un nuevo XML para ser firmado
         $xml = new \DOMDocument();
-        $xml->loadXML(file_get_contents($unsigned));
+
+        // Detectar si es un archivo (ruta en disco) o bien un string xml
+        if (file_exists($input)){
+            $input = file_get_contents($input);
+        }
+
+        // Intentar parsear el input como archivo xml. Caso contrario se detiene el script
+        try {
+            $xml->loadXML($input);
+        } catch (\Exception $ex){
+            die($ex->getMessage());
+        }
 
         // Crear un nuevo objeto de seguridad
         $objSec = new XMLSecurityDSig();
@@ -86,7 +105,19 @@ class Firmador {
         // Adjuntar la firma al xml
         $objSec->appendSignature($xml->documentElement);
 
-        // Guarda el xml firmado
-        $xml->save($signed);
+        if ($output == self::TO_BASE64_STRING){
+            // Devuelve el string del archivo xml firmado en formato Base64
+            return base64_encode($xml->saveXML());
+        } else if ($output == self::TO_XML_STRING){
+            // Devuelve el archivo xml firmado en formato string Xml
+            return $xml->saveXML();
+        } else if ($output == self::TO_XML_FILE){
+            // Guarda el xml firmado en la ruta especificada y devuelve el resultado
+            if (!is_null($path)) {
+                return $xml->save($path);
+            } else {
+                return false;
+            }
+        }
     }
 }

@@ -25,4 +25,4 @@ EXPOSE 80
 # Run with CERTIFICATE_UPLOAD and docker's ip address pool
 # in this case you have to upload the certificate prior to signing 
 
-# docker run --rm -d  -p 8081:80 -e CERTIFICATE_UPLOAD=true web-firmador:latest
+# docker run --rm -d  -p 8081:80 -e CERTIFICATE_UPLOAD=true php-firmador:latest

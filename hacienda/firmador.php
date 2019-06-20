@@ -68,6 +68,12 @@ class Firmador {
 
         // Mantener el primer nodo secundario original XML en memoria
         $objSec->xmlFirstChild = $xml->firstChild;
+        // MvS - Si el primer nodo es un xml stylesheet, usar el siguiente (el cual deberia ser la raiz)
+        if ( $objSec->xmlFirstChild->nodeName == "xml-stylesheet" )
+        {
+                $objSec->xmlFirstChild = $objSec->xmlFirstChild->nextSibling;
+        }
+
 
         // Establecer política de firma
         $objSec->setSignPolicy();

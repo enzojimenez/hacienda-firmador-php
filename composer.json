@@ -1,0 +1,15 @@
+{
+    "name": "enzojimenez/hacienda-firmador-php",
+    "type": "project",
+    "require": {
+        "slim/slim": "^4.7",
+        "slim/psr7": "^1.3",
+        "slim/http": "^1.2"
+    },
+    "authors": [
+        {
+            "name": "Enzo Jimenez",
+            "email": "enzofjh@gmail.com"
+        }
+    ]
+}
